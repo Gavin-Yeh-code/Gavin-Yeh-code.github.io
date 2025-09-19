@@ -53,7 +53,6 @@
         const arc = 2 * Math.PI / prizeCount; // 每个扇区的弧度
         let currentRotation = 0; // 当前旋转角度
         let isSpinning = false;
-        let forcedWinningPrize = null; // 强制指定的中奖结果
 
         function drawWheel() {
             const centerX = canvas.width / 2;
@@ -134,6 +133,7 @@
             // 发射彩带
             confetti({ particleCount: 150, spread: 90, origin: { y: 0.6 } });
 
+            // 显示中奖信息
             setTimeout(() => {
                 alert(`🎉 恭喜寿星！抽中了专属大奖：【${winningPrize.text}】！🎉`);
             }, 500);
