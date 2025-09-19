@@ -5,105 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>生日专属好运轮盘</title>
     <style>
-        /* 页面整体样式 */
-        body {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #2c3e50;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            overflow: hidden;
-            background-image: radial-gradient(circle, #34495e, #2c3e50);
-            color: #ecf0f1;
-            text-align: center;
-        }
-
-        h1 {
-            font-size: min(8vw, 2.5rem); /* 响应式字体大小 */
-            margin-bottom: 20px;
-            color: #f1c40f;
-            text-shadow: 2px 2px 5px rgba(0,0,0,0.3);
-        }
-
-        /* 抽奖容器 */
-        .wheel-container {
-            position: relative;
-            width: 90vmin; /* 使用vmin确保在手机和PC上都能较好地显示 */
-            height: 90vmin;
-            max-width: 500px;
-            max-height: 500px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        /* Canvas轮盘 */
-        #wheelCanvas {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5), inset 0 0 15px rgba(0,0,0,0.4);
-            transition: transform 6s cubic-bezier(0.1, 0.7, 0.3, 1);
-        }
-
-        /* 指针（放在正上方，更传统美观） */
-        .pointer-container {
-            position: absolute;
-            top: -15px; /* 指针尖端对准轮盘边缘 */
-            left: 50%;
-            transform: translateX(-50%);
-            width: 70px;
-            height: 90px;
-            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.4));
-            z-index: 10;
-        }
-        .pointer {
-            width: 100%;
-            height: 100%;
-            background: #e74c3c;
-            clip-path: polygon(50% 100%, 0 0, 100% 0);
-        }
-         .pointer::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 25px;
-            height: 25px;
-            background: #fff;
-            border-radius: 50%;
-            box-shadow: 0 0 5px rgba(0,0,0,0.3);
-        }
-
-        /* 抽奖按钮 */
-        #spinButton {
-            margin-top: 30px;
-            padding: 15px 40px;
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #2c3e50;
-            background-color: #f1c40f;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: background-color 0.3s, transform 0.1s;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-        #spinButton:hover:not(:disabled) {
-            background-color: #f39c12;
-        }
-        #spinButton:active:not(:disabled) {
-            transform: scale(0.95);
-        }
-        #spinButton:disabled {
-            background-color: #95a5a6;
-            cursor: not-allowed;
-            color: #7f8c8d;
-        }
+        body{display:flex;flex-direction:column;justify-content:center;align-items:center;height:100vh;margin:0;background-color:#2c3e50;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;overflow:hidden;background-image:radial-gradient(circle,#34495e,#2c3e50);color:#ecf0f1;text-align:center}h1{font-size:min(8vw,2.5rem);margin-bottom:20px;color:#f1c40f;text-shadow:2px 2px 5px rgba(0,0,0,.3)}.wheel-container{position:relative;width:90vmin;height:90vmin;max-width:500px;max-height:500px;display:flex;justify-content:center;align-items:center}#wheelCanvas{width:100%;height:100%;border-radius:50%;box-shadow:0 0 20px rgba(0,0,0,.5),inset 0 0 15px rgba(0,0,0,.4);transition:transform 6s cubic-bezier(.1,.7,.3,1)}.pointer-container{position:absolute;top:-15px;left:50%;transform:translateX(-50%);width:70px;height:90px;filter:drop-shadow(0 5px 5px rgba(0,0,0,.4));z-index:10}.pointer{width:100%;height:100%;background:#e74c3c;clip-path:polygon(50% 100%,0 0,100% 0)}.pointer::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:25px;height:25px;background:#fff;border-radius:50%;box-shadow:0 0 5px rgba(0,0,0,.3)}#spinButton{margin-top:30px;padding:15px 40px;font-size:1.5rem;font-weight:700;color:#2c3e50;background-color:#f1c40f;border:none;border-radius:50px;cursor:pointer;transition:background-color .3s,transform .1s;box-shadow:0 5px 15px rgba(0,0,0,.2)}#spinButton:hover:not(:disabled){background-color:#f39c12}#spinButton:active:not(:disabled){transform:scale(.95)}#spinButton:disabled{background-color:#95a5a6;cursor:not-allowed;color:#7f8c8d}
     </style>
 </head>
 <body>
@@ -121,28 +23,35 @@
     <script>
         // =================================================================================
         //
-        //                            🎉 核心配置区 - 在这里修改 🎉
+        //                          🎉【最终版】核心配置区 🎉
+        //                          逻辑超级清晰，保证只中心意奖品
         //
         // =================================================================================
-        const prizes = [
+
+        // 【第1步】定义所有会显示在轮盘上的奖品（包括诱饵）
+        const allPrizesOnWheel = [
+            // 奖品名称,         在轮盘上的颜色,        它在轮盘上的索引
             { text: '💕 生日祝福 💕', color: '#ffdd59' }, // 索引 0
-            { text: '一套好酒', color: '#ff6b6b' },       // 索引 1 (诱饵)
+            { text: '一套好酒',      color: '#ff6b6b' }, // 索引 1 (诱饵)
             { text: '💌 生日卡片 💌', color: '#7ed6df' }, // 索引 2
-            { text: '💰 888现金 💰', color: '#f0932b' }, // 索引 3 (诱饵)
-            { text: '💕 生日祝福 💕', color: '#a0deff' }, // 索引 4 (换个颜色)
-            { text: '一套好酒', color: '#ff6b6b' },       // 索引 5 (诱饵)
+            { text: '💰 888现金 💰',  color: '#f0932b' }, // 索引 3 (诱饵)
+            { text: '💕 生日祝福 💕', color: '#a0deff' }, // 索引 4
+            { text: '一套好酒',      color: '#ff6b6b' }, // 索引 5 (诱饵)
             { text: '💌 生日卡片 💌', color: '#7ed6df' }, // 索引 6
             { text: '💕 生日祝福 💕', color: '#ffdd59' }  // 索引 7
         ];
-        
-        let designatedPrizeIndex = 0; // 默认中第一个“生日祝福”
+
+        // 【第2步】明确告诉程序，哪些索引是“真正能中的奖”（心意奖品）
+        // 把你希望中的奖品的索引号，放进这个数组里。
+        // 其他的诱饵奖品（索引1, 3, 5）绝对不会被抽中！
+        const trulyWinnablePrizeIndexes = [0, 2, 4, 6, 7]; 
 
         // ======================== END OF CONFIG ========================
 
         const canvas = document.getElementById('wheelCanvas');
         const ctx = canvas.getContext('2d');
         const spinButton = document.getElementById('spinButton');
-        const prizeCount = prizes.length;
+        const prizeCount = allPrizesOnWheel.length;
         const arc = 2 * Math.PI / prizeCount;
         let rotationTarget = 0;
         let isSpinning = false;
@@ -151,9 +60,11 @@
             const centerX = canvas.width / 2;
             const centerY = canvas.height / 2;
             const radius = canvas.width / 2 - 10;
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // 清空画布，防止文字重叠
 
             for (let i = 0; i < prizeCount; i++) {
-                const prize = prizes[i];
+                const prize = allPrizesOnWheel[i];
                 const startAngle = i * arc;
                 const endAngle = startAngle + arc;
 
@@ -169,7 +80,15 @@
                 ctx.translate(centerX, centerY);
                 ctx.rotate(startAngle + arc / 2);
                 ctx.textAlign = 'right';
-                ctx.fillText(prize.text, radius * 0.9, 10);
+                // 确保文字在小屏幕上不会超出太多
+                const text = prize.text;
+                const textWidth = ctx.measureText(text).width;
+                const maxTextWidth = radius * 0.8;
+                if(textWidth > maxTextWidth) {
+                    ctx.font = `bold ${20 * maxTextWidth / textWidth}px Arial`;
+                }
+
+                ctx.fillText(text, radius * 0.9, 10);
                 ctx.restore();
             }
         }
@@ -180,21 +99,24 @@
             spinButton.disabled = true;
             spinButton.textContent = "转动中...";
 
-            // 决定中奖项
-            const winningIndexes = prizes.map((p, i) => ['💕 生日祝福 💕', '💌 生日卡片 💌'].includes(p.text) ? i : -1).filter(i => i !== -1);
-            designatedPrizeIndex = winningIndexes[Math.floor(Math.random() * winningIndexes.length)];
+            // 【核心作弊逻辑】
+            // 1. 从我们预设的“能中的奖品索引”数组中，随机挑选一个作为本次的中奖目标.
+            const randomIndex = Math.floor(Math.random() * trulyWinnablePrizeIndexes.length);
+            const designatedPrizeIndex = trulyWinnablePrizeIndexes[randomIndex];
             
-            // 计算旋转角度
+            // 2. 计算为了停在这个奖品上，轮盘需要转多少角度
             const prizeSliceCenter = arc * designatedPrizeIndex + arc / 2;
             const randomOffset = (Math.random() * 0.6 - 0.3) * arc; // 让指针停在扇区-30%到+30%的随机位置
             const targetAngle = prizeSliceCenter + randomOffset;
             
-            // 额外旋转5-8圈
-            const randomCircles = Math.floor(Math.random() * 4) + 5;
-            rotationTarget += randomCircles * 2 * Math.PI;
+            // 3. 额外加上几圈的旋转，让动画看起来更长更刺激
+            const randomCircles = Math.floor(Math.random() * 4) + 5; // 随机转5-8圈
+            // 计算最终需要旋转到的总弧度
+            rotationTarget += randomCircles * 2 * Math.PI; 
             rotationTarget = rotationTarget - (rotationTarget % (2 * Math.PI)) + 2*Math.PI - targetAngle;
 
-            canvas.style.transform = `rotate(${rotationTarget}rad)`; // 使用 rad 单位
+            // 4. 应用CSS动画
+            canvas.style.transform = `rotate(${rotationTarget}rad)`; 
         }
 
         canvas.addEventListener('transitionend', () => {
@@ -202,13 +124,13 @@
             spinButton.disabled = false;
             spinButton.textContent = "再来一次!";
 
-            const winningPrize = prizes[designatedPrizeIndex];
-
-            confetti({
-                particleCount: 150,
-                spread: 90,
-                origin: { y: 0.6 }
-            });
+            // 根据最终的旋转角度精准计算出实际停在哪个奖品上
+            // 注意：这里只是为了显示结果，实际中奖项在spin()函数里就已经100%确定了！
+            const actualRotation = rotationTarget % (2 * Math.PI);
+            const actualIndex = Math.floor((2*Math.PI - actualRotation + arc/2) % (2*Math.PI) / arc);
+            const winningPrize = allPrizesOnWheel[actualIndex];
+            
+            confetti({ particleCount: 150, spread: 90, origin: { y: 0.6 } });
 
             setTimeout(() => {
                 alert(`🎉 恭喜！抽中了寿星专属大奖：【${winningPrize.text}】！🎉`);
@@ -217,7 +139,7 @@
 
         spinButton.addEventListener('click', spin);
 
-        drawWheel(); // 初始绘制
+        drawWheel(); // 页面加载后立即绘制轮盘
     </script>
 </body>
 </html>
