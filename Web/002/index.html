@@ -22,33 +22,27 @@
 
     <script>
         // =================================================================================
-        //                          🎉【终极修复版】核心配置区 🎉
-        //                     采用强制结果替换，100%保证只中指定奖品
+        // 🎉【优化版】核心配置区 🎉
+        // 只有三个选项会中奖，其他是摆设
         // =================================================================================
 
         // 【第1步】定义所有会显示在轮盘上的奖品
         const allPrizesOnWheel = [
-            { text: '💕 生日祝福 💕', color: '#ffdd59' }, // 索引 0 ✅ 允许中奖
-            { text: '一套好酒',      color: '#ff6b6b' }, // 索引 1 ❌ 诱饵
-            { text: '💌 生日卡片 💌', color: '#7ed6df' }, // 索引 2 ✅ 允许中奖
-            { text: '💰 888现金 💰',  color: '#f0932b' }, // 索引 3 ❌ 诱饵
-            { text: '给我口一次',    color: '#ff9ff3' }, // 索引 4 ❌ 诱饵
-            { text: '💕 生日祝福 💕', color: '#a0deff' }, // 索引 5 ✅ 允许中奖
-            { text: '捅你菊花一次',  color: '#54a0ff' }, // 索引 6 ❌ 诱饵
-            { text: '💌 生日卡片 💌', color: '#5f27cd' }, // 索引 7 ✅ 允许中奖
-            { text: '亲全场女生一口', color: '#00d2d3' }, // 索引 8 ❌ 诱饵
-            { text: '💕 生日祝福 💕', color: '#ffdd59' }, // 索引 9 ✅ 允许中奖
-            { text: '一套好酒',      color: '#ff6b6b' }  // 索引 10 ❌ 诱饵
+            { text: '💕 生日祝福 💕', color: '#ffdd59' },  // 索引 0 ✅ 允许中奖
+            { text: '一套好酒',      color: '#ff6b6b' },   // 索引 1 ❌ 诱饵
+            { text: '💌 生日卡片 💌', color: '#7ed6df' },   // 索引 2 ✅ 允许中奖
+            { text: '💰 888现金 💰',  color: '#f0932b' },   // 索引 3 ❌ 诱饵
+            { text: '给我口一次',    color: '#ff9ff3' },   // 索引 4 ❌ 诱饵
+            { text: '💕 生日祝福 💕', color: '#a0deff' },   // 索引 5 ✅ 允许中奖
+            { text: '捅你菊花一次',  color: '#54a0ff' },   // 索引 6 ❌ 诱饵
+            { text: '💌 生日卡片 💌', color: '#5f27cd' },   // 索引 7 ✅ 允许中奖
+            { text: '亲全场女生一口', color: '#00d2d3' },   // 索引 8 ✅ 允许中奖
+            { text: '💕 生日祝福 💕', color: '#ffdd59' },   // 索引 9 ✅ 允许中奖
+            { text: '一套好酒',      color: '#ff6b6b' }    // 索引 10 ❌ 诱饵
         ];
 
-        // 【第2步】定义允许中奖的奖品内容（只有生日祝福和生日卡片）
-        const allowedWinningPrizes = [
-            '💕 生日祝福 💕',
-            '💌 生日卡片 💌'
-        ];
-
-        // 【第3步】预定义真正会中的奖品索引（只包含生日祝福和生日卡片）
-        const trulyWinnablePrizeIndexes = [0, 2, 5, 7, 9];
+        // 【第2步】指定真正会中的奖品（只有生日祝福、生日卡片和亲全场女生一口）
+        const trulyWinnablePrizeIndexes = [0, 2, 5, 7, 8]; 
 
         // ======================== END OF CONFIG ========================
 
@@ -56,8 +50,8 @@
         const ctx = canvas.getContext('2d');
         const spinButton = document.getElementById('spinButton');
         const prizeCount = allPrizesOnWheel.length;
-        const arc = 2 * Math.PI / prizeCount;
-        let currentRotation = 0;
+        const arc = 2 * Math.PI / prizeCount; // 每个扇区的弧度
+        let currentRotation = 0; // 当前旋转角度
         let isSpinning = false;
         let forcedWinningPrize = null; // 强制指定的中奖结果
 
@@ -109,23 +103,16 @@
             spinButton.disabled = true;
             spinButton.textContent = "转动中...";
 
-            // 【核心逻辑】提前决定最终要显示的结果
             // 从允许的中奖内容中随机选择一个
-            const randomWinningPrize = allowedWinningPrizes[Math.floor(Math.random() * allowedWinningPrizes.length)];
-            forcedWinningPrize = randomWinningPrize; // 保存强制结果
-
-            // 随机选择一个对应的索引用于旋转计算
-            const availableIndexes = trulyWinnablePrizeIndexes.filter(index => 
-                allPrizesOnWheel[index].text === randomWinningPrize
-            );
-            const targetIndex = availableIndexes[Math.floor(Math.random() * availableIndexes.length)];
-
-            // 计算旋转角度让指定扇区停在指针位置
-            const targetAngle = targetIndex * arc + arc / 2;
-            const randomOffset = (Math.random() - 0.5) * arc * 0.4; // 缩小偏移范围
-            const extraSpins = (Math.floor(Math.random() * 4) + 6) * 2 * Math.PI;
+            const targetPrizeIndex = trulyWinnablePrizeIndexes[Math.floor(Math.random() * trulyWinnablePrizeIndexes.length)];
             
-            const finalRotation = currentRotation + extraSpins - targetAngle + randomOffset;
+            // 计算旋转角度
+            const targetSliceCenter = targetPrizeIndex * arc + arc / 2;
+            const randomOffset = (Math.random() - 0.5) * arc * 0.6; // 在扇区范围内随机偏移
+            const extraSpins = (Math.floor(Math.random() * 4) + 6) * 2 * Math.PI; // 6-9圈
+            
+            // 计算最终旋转角度
+            const finalRotation = currentRotation + extraSpins - targetSliceCenter + randomOffset;
             
             canvas.style.transform = `rotate(${finalRotation}rad)`;
             currentRotation = finalRotation;
@@ -138,17 +125,18 @@
             spinButton.disabled = false;
             spinButton.textContent = "再来一次!";
 
-            // 【关键修复】：无论轮盘实际停在哪里，都强制显示我们预设的中奖结果
-            const displayResult = forcedWinningPrize || '💕 生日祝福 💕';
+            // 获取中奖结果
+            const normalizedRotation = ((currentRotation % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+            const pointerAngle = (2 * Math.PI - normalizedRotation) % (2 * Math.PI);
+            const actualIndex = Math.floor(pointerAngle / arc) % prizeCount;
+            const winningPrize = allPrizesOnWheel[actualIndex];
             
+            // 发射彩带
             confetti({ particleCount: 150, spread: 90, origin: { y: 0.6 } });
 
             setTimeout(() => {
-                alert(`🎉 恭喜寿星！抽中了专属大奖：【${displayResult}】！🎉`);
+                alert(`🎉 恭喜寿星！抽中了专属大奖：【${winningPrize.text}】！🎉`);
             }, 500);
-            
-            // 清空强制结果
-            forcedWinningPrize = null;
         });
 
         spinButton.addEventListener('click', spin);
